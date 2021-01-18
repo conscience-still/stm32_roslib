@@ -1,0 +1,86 @@
+#include "hw.h"
+
+#define MCU_3V3_CTRL_MODE         (GPIO_MODER_MODER2_0)
+#define MCU_3V3_CTRL_GPIO         (GPIOE)
+#define MCU_CTRL_SW_3V3			  (GPIO_BSRR_BS_2)
+
+#define MCU_5V_CTRL_MODE         (GPIO_MODER_MODER9_0)
+#define MCU_5V_CTRL_GPIO         (GPIOB)
+#define MCU_CTRL_SW_5V           (GPIO_BSRR_BS_9)
+
+#define MCU_CORE_CTRL_MODE         (GPIO_MODER_MODER8_0)
+#define MCU_CORE_CTRL_GPIO         (GPIOE)
+#define MCU_CTRL_SW_CORE           (GPIO_BSRR_BS_8)
+
+#define  MCU_DEVICE_CTRL_MODE  (GPIO_MODER_MODER5_0)
+#define MCU_DEVICE_CTRL_GPIO   GPIOB
+#define MCU_DEVICE_CTRL_BR	   GPIO_BSRR_BS_5
+
+
+#define MCU_BAT_A_MODE         (GPIO_MODER_MODER2_0)
+#define MCU_BAT_A_GPIO         (GPIOB)
+#define MCU_CTRL_BAT_A         (GPIO_BSRR_BS_2)
+
+#define MCU_BAT_B_MODE         (GPIO_MODER_MODER7_0)
+#define MCU_BAT_B_GPIO         (GPIOE)
+#define MCU_CTRL_BAT_B         (GPIO_BSRR_BS_7)
+void  SWInit(void)
+{
+  GPIO_InitTypeDef        GPIO_InitStructure;
+
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC,ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD,ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE,ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF,ENABLE);
+  RCC->AHBENR |=(RCC_AHBENR_GPIOAEN|
+             RCC_AHBENR_GPIOBEN|
+             RCC_AHBENR_GPIOCEN|
+             RCC_AHBENR_GPIODEN|
+             RCC_AHBENR_GPIOEEN|
+             RCC_AHBENR_GPIOFEN|
+             RCC_AHBENR_DMA1EN );
+
+  RCC->APB1ENR |=(RCC_APB1ENR_TIM6EN  |
+             RCC_APB1ENR_TIM3EN  |
+             RCC_APB1ENR_TIM2EN  |
+             RCC_APB1ENR_USART2EN| 
+             RCC_APB1ENR_USART3EN|
+                             RCC_APB1ENR_USART4EN|
+             RCC_APB1ENR_TIM14EN |
+                             RCC_APB1ENR_I2C2EN);
+
+  RCC->APB2ENR |= (RCC_APB2ENR_SYSCFGCOMPEN|
+              RCC_APB2ENR_USART1EN |
+              RCC_APB2ENR_TIM1EN   |
+              RCC_APB2ENR_TIM15EN  |
+              RCC_APB2ENR_TIM16EN  |
+              RCC_APB2ENR_TIM17EN  |
+              RCC_APB2ENR_ADCEN    );
+  MCU_5V_CTRL_GPIO->MODER |=	MCU_5V_CTRL_MODE;    
+  MCU_3V3_CTRL_GPIO->MODER |=	MCU_3V3_CTRL_MODE;    
+  MCU_3V3_CTRL_GPIO->BSRR |= MCU_CTRL_SW_3V3;
+  MCU_5V_CTRL_GPIO->BSRR |= MCU_CTRL_SW_5V;
+
+
+  MCU_CORE_CTRL_GPIO->MODER |=	MCU_CORE_CTRL_MODE;    
+  MCU_CORE_CTRL_GPIO->BSRR |= MCU_CTRL_SW_CORE;
+
+  MCU_BAT_A_GPIO->MODER |=	MCU_BAT_A_MODE; /*AB BAT */
+  MCU_BAT_B_GPIO->MODER |=	MCU_BAT_B_MODE; /*AB BAT */			
+  MCU_BAT_A_GPIO->BRR  |= MCU_CTRL_BAT_A;	
+  MCU_BAT_B_GPIO->BRR  |= MCU_CTRL_BAT_B;
+
+  MCU_DEVICE_CTRL_GPIO->MODER |=MCU_DEVICE_CTRL_MODE;    
+  MCU_DEVICE_CTRL_GPIO->BSRR |= MCU_DEVICE_CTRL_BR;
+
+}	
+
+
+void HwInit(void)
+{
+  //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+  SWInit();
+
+}
